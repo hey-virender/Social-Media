@@ -3,6 +3,7 @@ import { Children, createContext, useReducer } from "react";
 export const PostList = createContext({
   postList: [],
   addPost: () => {},
+  addInitialPost: () => {},
   deletePost: () => {},
 });
 const postListReducer = (currPostList, action) => {
@@ -13,14 +14,14 @@ const postListReducer = (currPostList, action) => {
     );
   } else if (action.type === "ADD_POST") {
     newPostList = [action.payload, ...currPostList];
+  } else if (action.type === "ADD_INITIAL_POST") {
+    newPostList = action.payload.posts;
   }
+
   return newPostList;
 };
 const PostlistProvider = ({ children }) => {
-  const [postList, dispatchPostList] = useReducer(
-    postListReducer,
-    DEFAULT_POST_LIST
-  );
+  const [postList, dispatchPostList] = useReducer(postListReducer, []);
   const addPost = (userId, postIitle, postBody, reactions, tags) => {
     dispatchPostList({
       type: "ADD_POST",
@@ -30,6 +31,14 @@ const PostlistProvider = ({ children }) => {
         body: postBody,
         reactions: reactions,
         tags: tags,
+      },
+    });
+  };
+  const addInitialPost = (posts) => {
+    dispatchPostList({
+      type: "ADD_INITIAL_POST",
+      payload: {
+        posts,
       },
     });
   };
@@ -47,6 +56,7 @@ const PostlistProvider = ({ children }) => {
       value={{
         postList,
         addPost,
+        addInitialPost,
         deletePost,
       }}
     >
@@ -54,30 +64,5 @@ const PostlistProvider = ({ children }) => {
     </PostList.Provider>
   );
 };
-const DEFAULT_POST_LIST = [
-  {
-    id: 1,
-    title: "Learning React",
-    body: "Hey everyone I am learing react and created this project using react",
-    reactions: 5000,
-    userId: "Virender_Chauhan",
-    tags: ["Learning", "React", "FrontEndWebDev"],
-  },
-  {
-    id: 2,
-    title: "Going to Shimla",
-    body: "Hi friends I am going to Shimla",
-    reactions: 0,
-    userId: "user-5",
-    tags: ["vacation", "shimla", "fun"],
-  },
-  {
-    id: 3,
-    title: "Just Completed Dimploma",
-    body: "completed PGDCA",
-    reactions: 7,
-    userId: "user-4",
-    tags: ["passed", "education", "knowledge"],
-  },
-];
+
 export default PostlistProvider;
